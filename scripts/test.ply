@@ -11,7 +11,7 @@ kprobe:SyS_*
 	/* printf("flags:%x\n", arg(1)); */
 	/* printf("comm:%s\n", comm()); */
 
-	syscalls[func()].count();
+	$syscalls[func()].count();
 }
 
 /* kprobe:SyS_read */
