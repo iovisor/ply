@@ -2,7 +2,7 @@
 #
 # Attach return-probes
 
-trace:raw_syscalls/sys_exit / ret() < 0 /
+trace:raw_syscalls/sys_exit / (ret() < 0) /
 {
 	@[comm()].count()
 }
