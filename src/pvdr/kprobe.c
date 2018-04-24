@@ -63,8 +63,6 @@ typedef struct profile {
 	kprobe_t *kp;
 } profile_t;
 
-#define	KPROBE_MAXLEN	0x100
-
 static int probe_event_id(kprobe_t *kp, const char *path)
 {
 	FILE *fp;
