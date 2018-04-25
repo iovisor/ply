@@ -37,15 +37,16 @@ FILE *scriptfp;
 
 struct globals G;
 
-static const char *sopts = "AcdDht:v";
+static const char *sopts = "AcdDhPt:v";
 static struct option lopts[] = {
-	{ "ascii",   no_argument,       0, 'A' },
-	{ "command", no_argument,       0, 'c' },
-	{ "debug",   no_argument,       0, 'd' },
-	{ "dump",    no_argument,       0, 'D' },
-	{ "help",    no_argument,       0, 'h' },
-	{ "timeout", required_argument, 0, 't' },
-	{ "version", no_argument,       0, 'v' },
+	{ "ascii",     no_argument,       0, 'A' },
+	{ "command",   no_argument,       0, 'c' },
+	{ "debug",     no_argument,       0, 'd' },
+	{ "dump",      no_argument,       0, 'D' },
+	{ "help",      no_argument,       0, 'h' },
+	{ "providers", no_argument,       0, 'P' },
+	{ "timeout",   required_argument, 0, 't' },
+	{ "version",   no_argument,       0, 'v' },
 
 	{ NULL }
 };
@@ -64,6 +65,7 @@ static void usage()
 	     "  -d                  Enable debug output.\n"
 	     "  -D                  Dump generated BPF and exit.\n"
 	     "  -h                  Print usage message and exit.\n"
+		 "  -P                  Print available Providers.\n"
 	     "  -t <timeout>        Terminate trace after <timeout> seconds.\n"
 	     "  -v                  Print version information.\n"
 		);
@@ -105,6 +107,10 @@ static int parse_opts(int argc, char **argv, FILE **sfp)
 			break;
 		case 'h':
 			usage(); exit(0);
+			break;
+		case 'P':
+			pvdr_print();
+			exit(0);
 			break;
 		case 't':
 			G.timeout = strtol(optarg, NULL, 0);

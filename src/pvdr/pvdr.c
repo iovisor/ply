@@ -26,7 +26,26 @@
 TAILQ_HEAD(pvdrs, pvdr);
 static struct pvdrs pvdr_list = TAILQ_HEAD_INITIALIZER(pvdr_list);
 
+/*
+ * pvdr_print - Print available providers and their short description
+ */
+int 
+pvdr_print(void)
+{
+	pvdr_t *pvdr;
+	int err = 0;
+	
+	printf("%20s %s\n", "PROVIDER", "DESCRIPTION");
+	TAILQ_FOREACH(pvdr, &pvdr_list, node) {
+		printf("%20s %s\n", pvdr->name, pvdr->desc);
+	}
 
+	return err;
+}
+
+/* 
+ * pvdr_find - Find a provider in the registered list
+ */
 pvdr_t *pvdr_find(const char *pspec)
 {
 	pvdr_t *pvdr;

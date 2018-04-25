@@ -179,61 +179,6 @@ static int probe_teardown(node_t *probe)
 	return err;
 }
 
-/* TRACEPOINT provider */
-#ifdef LINUX_HAS_TRACEPOINT
-static int trace_attach(kprobe_t *kp, const char *func)
-{
-	int id;
-
-	id = probe_event_id(kp, func);
-	if (id < 0)
-		return id;
-
-	return probe_attach(kp, id);
-}
-
-static int trace_load(node_t *probe, prog_t *prog)
-{
-	kprobe_t *kp;
-	char *func;
-
-	kp = probe_load(BPF_PROG_TYPE_TRACEPOINT, probe, prog);
-	if (!kp)
-		return -EINVAL;
-
-	probe->dyn->probe.pvdr_priv = kp;
-
-	func = strchr(probe->string, ':') + 1;
-
-	return trace_attach(kp, func);
-}
-
-const module_t *trace_modules[] = {
-	&trace_module,
-
-	&method_module,
-	&common_module,
-
-	NULL
-};
-
-static int trace_resolve(node_t *call, const func_t **f)
-{
-	return modules_get_func(trace_modules, call, f);
-}
-
-pvdr_t trace_pvdr = {
-	.name = "trace",
-
-	.resolve = trace_resolve,
-
-	.setup      = trace_load,
-	.teardown   = probe_teardown,
-};
-
-#endif
-
-
 /* KPROBE provider */
 
 /*
@@ -485,6 +430,7 @@ static int kprobe_teardown(node_t *probe)
 
 pvdr_t kprobe_pvdr = {
 	.name = "kprobe",
+	.desc = "Kernel function entry provider.",
 
 	.dflt    = kprobe_default,
 	.resolve = kprobe_resolve,
@@ -543,6 +489,7 @@ static int kretprobe_setup(node_t *probe, prog_t *prog)
 
 pvdr_t kretprobe_pvdr = {
 	.name = "kretprobe",
+	.desc = "Kernel function return provider.",
 
 	.dflt    = kretprobe_default,
 	.resolve = kretprobe_resolve,
@@ -673,6 +620,7 @@ out:
 
 pvdr_t profile_pvdr = {
         .name = "profile",
+		.desc = "Profiles with time-based intervals.",
 
         .resolve = profile_resolve,
 
@@ -711,6 +659,7 @@ static int uprobe_setup(node_t *probe, prog_t *prog)
 
 pvdr_t uprobe_pvdr = {
 	.name = "uprobe",
+	.desc = "Userland function entry provider.",
 
 	.resolve = kprobe_resolve,
 
@@ -726,6 +675,7 @@ static int uretprobe_setup(node_t *probe, prog_t *prog)
 
 pvdr_t uretprobe_pvdr = {
 	.name = "uretprobe",
+	.desc = "Userland function return provider.",
 
 	.resolve = kretprobe_resolve,
 
@@ -733,14 +683,10 @@ pvdr_t uretprobe_pvdr = {
 	.teardown = kprobe_teardown,
 };
 
-/* REGISTRATION */
-
+/* Register Proiver */
 __attribute__((constructor))
 static void kprobe_pvdr_register(void)
 {
-#ifdef LINUX_HAS_TRACEPOINT
-	pvdr_register(    &trace_pvdr);
-#endif
 	pvdr_register(   &kprobe_pvdr);
 	pvdr_register(&kretprobe_pvdr);
 	pvdr_register(  &profile_pvdr);

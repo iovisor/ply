@@ -25,11 +25,11 @@
 #include <ply/ast.h>
 #include <ply/compile.h>
 #include <ply/module.h>
-
 typedef struct pvdr {
 	TAILQ_ENTRY(pvdr) node;
 
-	const char *name;
+	const char *name;	/* Name of provider */
+	const char *desc; 	/* Short description */
 
 	int    (*dflt)(node_t *probe, node_t **stmts);
 	int (*resolve)(node_t *call, const func_t **f);
@@ -38,6 +38,7 @@ typedef struct pvdr {
 	int (*teardown)(node_t *probe);
 } pvdr_t;
 
+int 	pvdr_print	 (void);
 pvdr_t *pvdr_find    (const char *name);
 int     pvdr_resolve (node_t *script);
 void    pvdr_register(pvdr_t *pvdr);
