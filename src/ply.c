@@ -51,7 +51,7 @@ static struct option lopts[] = {
 	{ NULL }
 };
 
-static void usage()
+static void usage(void)
 {
 	puts("ply - Dynamic tracing utility\n"
 	     "\n"

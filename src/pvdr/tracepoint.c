@@ -116,8 +116,9 @@ pvdr_t trace_pvdr = {
 	.teardown   = probe_teardown,
 };
 
+/* Register provider */
 __attribute__((constructor))
-static void kprobe_pvdr_register(void)
+static void trace_pvdr_register(void)
 {
 	pvdr_register(&trace_pvdr);
 }

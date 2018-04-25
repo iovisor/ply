@@ -31,6 +31,9 @@ using kprobes and tracepoints.
   * `-h`, `--help`:
     Print usage message.
 
+  * `-P`, `--providers`:
+    Show available providers. See PROVIDERS.
+
   * `-t`, `--timeout`=<seconds>:
     Terminate the program after the specified time.
 

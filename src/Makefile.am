@@ -15,7 +15,8 @@ BUILT_SOURCES = lang/lex.h lang/parse.h
 ply_SOURCES   = lang/lex.c lang/parse.y lang/ast.c
 ply_SOURCES  += module/module.c module/common.c module/method.c module/printf.c \
 		module/probe.c module/quantize.c module/trace.c
-ply_SOURCES  += pvdr/pvdr.c pvdr/kprobe.c pvdr/tracepoint.c
+ply_SOURCES  += pvdr/pvdr.c pvdr/kprobe.c pvdr/tracepoint.c pvdr/profile.c \
+		pvdr/uprobe.c
 ply_SOURCES  += annotate.c bpf-syscall.c compile.c evpipe.c kallsyms.c \
 		map.c ply.c symtable.c utils.c
 
