@@ -15,9 +15,6 @@ using kprobes and tracepoints.
 
 ## OPTIONS
 
-  * `-A`, `--ascii`:
-    Restrict output to ASCII, no Unicode runes.
-
   * `-c` <command>, `--command`=<command>:
     When all probes are running, run <command>. When the command
     exits, stop all probes and exit. The command is run as if invoked
