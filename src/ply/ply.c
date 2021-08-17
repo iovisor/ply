@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <getopt.h>
 #include <errno.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -218,6 +219,10 @@ static void term(int sig)
 	term_sig = sig;
 	return;
 }
+static const struct sigaction term_action = {
+	.sa_handler = term,
+	.sa_flags = 0,
+};
 
 int main(int argc, char **argv)
 {
@@ -303,10 +308,8 @@ int main(int argc, char **argv)
 	ply_start(ply);
 	fprintf(stderr, "ply: active\n");
 
-	signal(SIGINT, term);
-	signal(SIGCHLD, term);
-	siginterrupt(SIGINT, 1);
-	siginterrupt(SIGCHLD, 1);
+	sigaction(SIGINT, &term_action, NULL);
+	sigaction(SIGCHLD, &term_action, NULL);
 
 	if (cmd) {
 		int err = 0;
