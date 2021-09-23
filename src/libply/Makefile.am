@@ -40,6 +40,7 @@ libply_la_SOURCES     = 	\
 	provider/tracepoint.c	\
 	provider/xprobe.c	\
 	provider/xprobe.h	\
+	provider/special.c	\
 	\
 	compile.c		\
 	func.c			\

@@ -38,6 +38,7 @@ struct ply_probe {
 
 	struct ir *ir;
 	int bpf_fd;
+	int special;
 };
 
 struct ply_config {
@@ -98,5 +99,9 @@ void ply_free  (struct ply *ply);
 int  ply_alloc (struct ply **plyp);
 
 void ply_init(void);
+
+typedef void (*special_probe_t)(void);
+
+int register_special_probes(special_probe_t begin, special_probe_t end);
 
 #endif	/* _PLY_H */

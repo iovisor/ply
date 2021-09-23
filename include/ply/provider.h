@@ -32,4 +32,7 @@ struct provider {
 struct provider *provider_get(const char *name);
 void provider_init(void);
 
+void trigger_begin_probe(struct ply_probe *pb);
+void trigger_end_probe(struct ply_probe *pb);
+
 #endif	/* _PROVIDER_H */

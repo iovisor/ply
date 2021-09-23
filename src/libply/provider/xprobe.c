@@ -31,11 +31,19 @@ static int xprobe_stem(struct ply_probe *pb, char type, char *stem, size_t size)
 
 static int __xprobe_create(FILE *ctrl, const char *stem, const char *func)
 {
-	char *funcname = strdup(func);
+	char *funcname;
 	char *offs;
 
+	if (strchr(func, '/'))
+		funcname = strdup(strrchr(func, '/') + 1);
+	else
+		funcname = strdup(func);
 	assert(funcname);
+
 	offs = strchr(funcname, '+');
+	if (offs)
+		*offs = '_';
+	offs = strchr(funcname, ':');
 	if (offs)
 		*offs = '_';
 
@@ -206,7 +214,8 @@ static int __xprobe_attach(struct ply_probe *pb)
 	
 	assert(gl.gl_pathc == xp->n_evs);
 	for (i = 0; i < (int)gl.gl_pathc; i++) {
-		xp->evfds[i] = perf_event_attach(pb, gl.gl_pathv[i], 0);
+		xp->evfds[i] = perf_event_attach(pb, gl.gl_pathv[i],
+						 pb->special);
 		if (xp->evfds[i] < 0) {
 			err = xp->evfds[i];
 			break;
