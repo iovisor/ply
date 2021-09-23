@@ -19,8 +19,9 @@ fi
 
 if [ "$kconf" ]; then
     $kconf | awk '
-        /^CONFIG_BPF_SYSCALL=y$/    { bpf=1 }
+	/^CONFIG_BPF_SYSCALL=y$/    { bpf=1 }
 	/^CONFIG_KPROBES=y$/        { kprobes=1 }
+	/^CONFIG_UPROBES=y$/        { uprobes=1 }
 	/^CONFIG_TRACEPOINTS=y$/    { tracepoints=1 }
 	/^CONFIG_FTRACE=y$/         { ftrace=1 }
 	/^CONFIG_DYNAMIC_FTRACE=y$/ { dftrace=1 }
@@ -38,6 +39,8 @@ if [ "$kconf" ]; then
 	       print("  CONFIG_BPF_SYSCALL is not set");
 	    if (!kprobes)
 	       print("  CONFIG_KPROBES is not set");
+	    if (!uprobes)
+	       print("  CONFIG_UPROBES is not set");
 	    if (!tracepoints)
 	       print("  CONFIG_TRACEPOINTS is not set");
 	    if (!ftrace)
@@ -75,6 +78,14 @@ fi
 
 echo -n "Verifying tracepoint... "
 if $PLYBIN 'tracepoint:sched/sched_switch { exit(0); }' 2>/dev/null; then
+    echo "OK"
+else
+    echo "ERROR"
+    err=1
+fi
+
+echo -n "Verifying special... "
+if $PLYBIN 'BEGIN { exit(0); }' 2>/dev/null; then
     echo "OK"
 else
     echo "ERROR"
