@@ -206,7 +206,7 @@ static int __xprobe_attach(struct ply_probe *pb)
 	
 	assert(gl.gl_pathc == xp->n_evs);
 	for (i = 0; i < (int)gl.gl_pathc; i++) {
-		xp->evfds[i] = perf_event_attach(pb, gl.gl_pathv[i]);
+		xp->evfds[i] = perf_event_attach(pb, gl.gl_pathv[i], 0);
 		if (xp->evfds[i] < 0) {
 			err = xp->evfds[i];
 			break;

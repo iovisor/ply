@@ -207,7 +207,7 @@ static int tracepoint_attach(struct ply_probe *pb)
 {
 	struct tracepoint *tp = pb->provider_data;
 
-	tp->evfd = perf_event_attach(pb, tp->path);
+	tp->evfd = perf_event_attach(pb, tp->path, 0);
 	if (tp->evfd < 0)
 		return tp->evfd;
 

@@ -11,7 +11,8 @@
 
 struct ply_probe;
 
-int perf_event_attach(struct ply_probe *pb, const char *name);
+int perf_event_attach(struct ply_probe *pb, const char *name,
+		      int task_mode);
 
 int perf_event_enable (int group_fd);
 int perf_event_disable(int group_fd);
