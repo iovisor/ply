@@ -153,21 +153,26 @@ struct ply_return buffer_q_drain(struct buffer_q *q)
 	return ret;
 }
 
-struct ply_return buffer_loop(struct buffer *buf)
+struct ply_return buffer_loop(struct buffer *buf, int timeout)
 {
 	struct ply_return ret;
 	uint32_t cpu;
 	int ready;
 
 	for (;;) {
-		ready = poll(buf->poll, buf->ncpus, -1);
+		ready = poll(buf->poll, buf->ncpus, timeout);
 		if (ready < 0) {
 			ret.err = 1;
 			ret.val = errno;
 			return ret;
 		}
 
-		assert(ready);
+		if (timeout == -1) {
+			assert(ready);
+		} else if (ready == 0) {
+			ret.err = 0;
+			return ret;
+		}
 
 		for (cpu = 0; ready && (cpu < buf->ncpus); cpu++) {
 			if (!(buf->poll[cpu].revents & POLLIN))

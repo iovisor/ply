@@ -36,6 +36,6 @@ struct buffer;
 
 struct buffer *buffer_new(int mapfd);
 
-struct ply_return buffer_loop(struct buffer *buf);
+struct ply_return buffer_loop(struct buffer *buf, int timeout);
 
 #endif	/* _PLY_BUFFER_H */

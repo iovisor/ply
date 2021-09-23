@@ -374,7 +374,7 @@ struct ply_return ply_loop(struct ply *ply)
 		return (struct ply_return){ .err = 1, .val = EINTR };
 	}
 
-	return buffer_loop((struct buffer *)ply->stdbuf->priv);
+	return buffer_loop((struct buffer *)ply->stdbuf->priv, -1);
 }
 
 int ply_stop(struct ply *ply)
