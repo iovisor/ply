@@ -86,7 +86,7 @@ struct ply_return ply_loop(struct ply *ply);
 int ply_start(struct ply *ply);
 int ply_stop(struct ply *ply);
 
-int ply_load(struct ply *ply);
+struct ply_return ply_load(struct ply *ply);
 int ply_unload(struct ply *ply);
 
 int ply_add_probe(struct ply *ply, struct ply_probe *probe);

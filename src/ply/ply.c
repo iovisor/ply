@@ -304,8 +304,8 @@ int main(int argc, char **argv)
 
 	memlock_uncap();
 
-	ret.val = ply_load(ply);
-	if (ret.val)
+	ret = ply_load(ply);
+	if (ret.exit || ret.err)
 		goto err;
 
 	ply_start(ply);

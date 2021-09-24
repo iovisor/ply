@@ -324,9 +324,10 @@ load:
 	return err;
 }
 
-static int ply_load_attach(struct ply *ply)
+static struct ply_return ply_load_attach(struct ply *ply)
 {
 	struct ply_probe *pb;
+	struct ply_return ret;
 	int err;
 
 	ply_probe_foreach(ply, pb) {
@@ -335,17 +336,20 @@ static int ply_load_attach(struct ply *ply)
 
 		err = pb->provider->attach(pb);
 		if (err)
-			return err;
+			goto err;
 
 		trigger_begin_probe(pb);
 
 		err = pb->provider->detach(pb);
 		if (err)
-			return err;
+			goto err;
 
 		/* read buffer for BEGIN trigger */
-		if (ply->stdbuf)
-			buffer_loop((struct buffer *)ply->stdbuf->priv, 0);
+		if (ply->stdbuf) {
+			ret = buffer_loop((struct buffer *)ply->stdbuf->priv, 0);
+			if (ret.exit || ret.err)
+				return ret;
+		}
 	}
 
 	ply_probe_foreach(ply, pb) {
@@ -354,15 +358,21 @@ static int ply_load_attach(struct ply *ply)
 
 		err = pb->provider->attach(pb);
 		if (err)
-			return err;
+			goto err;
 	}
 
-	return 0;
+	return (struct ply_return){0};
+
+err:
+	ret.err = 1;
+	ret.val = err;
+	return ret;
 }
 
-int ply_load(struct ply *ply)
+struct ply_return ply_load(struct ply *ply)
 {
 	int err;
+	struct ply_return ret = { .err = 1, };
 
 	/* Maps has to be allocated first, since we need those fds
 	 * before calling ir_bpf_extract. */
@@ -375,11 +385,11 @@ int ply_load(struct ply *ply)
 	if (err)
 		goto err_free_map;
 
-	err = ply_load_attach(ply);
-	if (err)
+	ret = ply_load_attach(ply);
+	if (ret.err || ret.exit)
 		goto err_free_prog;
 
-	return 0;
+	return ret;
 err_free_prog:
 	ply_unload_bpf(ply);
 err_free_map:
@@ -387,7 +397,9 @@ err_free_map:
 err_free_evp:
 	/* TODO evpipe_free(&ply->evp); */
 err:
-	return err;
+	if (err)
+		ret.val = err;
+	return ret;
 
 }
 
