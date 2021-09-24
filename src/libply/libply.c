@@ -379,11 +379,38 @@ struct ply_return ply_loop(struct ply *ply)
 
 int ply_stop(struct ply *ply)
 {
-	return perf_event_disable(ply->group_fd);
+	struct ply_probe *pb;
+	int err;
+
+	err = perf_event_disable(ply->group_fd);
+	if (err)
+		return err;
+
+	/* run END probe at last */
+	ply_probe_foreach(ply, pb) {
+		if (!pb->special || strcmp(pb->provider->name, "END"))
+			continue;
+
+		trigger_end_probe(pb);
+
+		if (ply->stdbuf)
+			buffer_loop((struct buffer *)ply->stdbuf->priv, 0);
+	}
+	return 0;
 }
 
 int ply_start(struct ply *ply)
 {
+	struct ply_probe *pb;
+
+	/* run BEGIN probe first */
+	ply_probe_foreach(ply, pb) {
+		if (!pb->special || strcmp(pb->provider->name, "BEGIN"))
+			continue;
+
+		trigger_begin_probe(pb);
+	}
+
 	return perf_event_enable(ply->group_fd);
 }
 
@@ -429,7 +456,9 @@ err:
 	return err;
 }
 
-void ply_init(void)
+extern int register_special_probes(special_probe_t begin, special_probe_t end);
+
+void ply_init(special_probe_t begin, special_probe_t end)
 {
 	static int init_done = 0;
 
@@ -438,6 +467,8 @@ void ply_init(void)
 
 	provider_init();
 	built_in_init();
+
+	register_special_probes(begin, end);
 
 	init_done = 1;
 }

@@ -19,6 +19,8 @@ extern struct provider kprobe;
 extern struct provider kretprobe;
 extern struct provider tracepoint;
 extern struct provider built_in;
+extern struct provider begin_provider;
+extern struct provider end_provider;
 
 struct provider *provider_get(const char *name)
 {
@@ -38,6 +40,8 @@ struct provider *provider_get(const char *name)
 
 void provider_init(void)
 {
+	SLIST_INSERT_HEAD(&heads, &end_provider, entry);
+	SLIST_INSERT_HEAD(&heads, &begin_provider, entry);
 	SLIST_INSERT_HEAD(&heads, &built_in, entry);
 	SLIST_INSERT_HEAD(&heads, &tracepoint, entry);
 	SLIST_INSERT_HEAD(&heads, &kretprobe, entry);

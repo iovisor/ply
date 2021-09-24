@@ -98,10 +98,8 @@ int  ply_parsef(struct ply *ply, const char *fmt, ...);
 void ply_free  (struct ply *ply);
 int  ply_alloc (struct ply **plyp);
 
-void ply_init(void);
-
 typedef void (*special_probe_t)(void);
 
-int register_special_probes(special_probe_t begin, special_probe_t end);
+void ply_init(special_probe_t begin, special_probe_t end);
 
 #endif	/* _PLY_H */

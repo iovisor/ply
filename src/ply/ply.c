@@ -281,7 +281,7 @@ int main(int argc, char **argv)
 	/* TODO figure this out dynamically. terminfo? */
 	ply_config.unicode = 1;
 
-	ply_init();
+	ply_init(NULL, NULL);
 
 	ply_alloc(&ply);
 	ret.val = ply_fparse(ply, src);
