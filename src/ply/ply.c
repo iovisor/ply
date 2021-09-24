@@ -224,6 +224,9 @@ static const struct sigaction term_action = {
 	.sa_flags = 0,
 };
 
+void __attribute__((noinline)) ply_begin_trigger(void) { asm volatile (""); }
+void __attribute__((noinline)) ply_end_trigger(void) { asm volatile (""); }
+
 int main(int argc, char **argv)
 {
 	struct ply *ply;
@@ -281,7 +284,7 @@ int main(int argc, char **argv)
 	/* TODO figure this out dynamically. terminfo? */
 	ply_config.unicode = 1;
 
-	ply_init(NULL, NULL);
+	ply_init(ply_begin_trigger, ply_end_trigger);
 
 	ply_alloc(&ply);
 	ret.val = ply_fparse(ply, src);
@@ -306,7 +309,7 @@ int main(int argc, char **argv)
 		goto err;
 
 	ply_start(ply);
-	fprintf(stderr, "ply: active\n");
+	_d("ply: active\n");
 
 	sigaction(SIGINT, &term_action, NULL);
 	sigaction(SIGCHLD, &term_action, NULL);
@@ -326,7 +329,7 @@ int main(int argc, char **argv)
 	if (ret.err && (ret.val == EINTR) && term_sig)
 		ret.err = 0;
 stop:
-	fprintf(stderr, "ply: deactivating\n");
+	_d("ply: deactivating\n");
 	ply_stop(ply);
 
 	ply_maps_print(ply);

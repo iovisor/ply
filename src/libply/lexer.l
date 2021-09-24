@@ -63,6 +63,9 @@ pspec		{ident}:[^ \n\r\t]*
 "!="			{ return NE;      }
 "->"			{ return DEREF;   }
 
+"BEGIN"			{ *yylval = node_string(yylloc, strdup(yytext));       return PSPEC;  }
+"END"			{ *yylval = node_string(yylloc, strdup(yytext));       return PSPEC;  }
+
 \"[^\0\"]*\"		{ *yylval = node_string(yylloc, strdup(yytext));       return STRING; }
 [_0-9]+			{ *yylval = node_num   (yylloc, strdup(yytext));       return NUMBER; }
 0b[_01]+		{ *yylval = node_num   (yylloc, strdup(yytext));       return NUMBER; }
