@@ -418,9 +418,11 @@ int ply_stop(struct ply *ply)
 	struct ply_probe *pb;
 	int err;
 
-	err = perf_event_disable(ply->group_fd);
-	if (err)
-		return err;
+	if (ply->group_fd >= 0) {
+		err = perf_event_disable(ply->group_fd);
+		if (err)
+			return err;
+	}
 
 	err = ply_unload_detach(ply);
 	if (err)
@@ -454,6 +456,9 @@ int ply_stop(struct ply *ply)
 
 int ply_start(struct ply *ply)
 {
+	if (ply->group_fd < 0)
+		return 0;
+
 	return perf_event_enable(ply->group_fd);
 }
 
