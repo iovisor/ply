@@ -131,16 +131,16 @@ struct ply_return buffer_q_drain(struct buffer_q *q)
 			lost = (void *)ev;
 
 			if (ply_config.strict) {
-				_e("lost %"PRId64" events", lost->lost);
+				_e("lost %"PRId64" events\n", lost->lost);
 				ret.err = 1;
 				ret.val = EOVERFLOW;
 			} else {
-				_w("lost %"PRId64" events", lost->lost);
+				_w("lost %"PRId64" events\n", lost->lost);
 			}
 			break;
 
 		default:
-			_e("unknown perf event %#"PRIx32, ev->hdr.type);
+			_e("unknown perf event %#"PRIx32"\n", ev->hdr.type);
 			ret.err = 1;
 			ret.val = EINVAL;
 			break;

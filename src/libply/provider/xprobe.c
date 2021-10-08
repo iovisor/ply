@@ -52,6 +52,7 @@ static int __xprobe_create(FILE *ctrl, const char *stem, const char *func)
 	fputc( ' ',     ctrl);
 	fputs(func,     ctrl);
 	fputc('\n',     ctrl);
+	_d("writing xprobe: %s%s %s\n", stem, funcname, func);
 
 	free(funcname);
 	return strlen(stem) + 2 * strlen(func) + 2;
@@ -116,6 +117,7 @@ int xprobe_detach(struct ply_probe *pb)
 		fputs(&gl.gl_pathv[i][evstart], xp->ctrl);
 		pending += strlen(&gl.gl_pathv[i][evstart]);
 		fputc('\n', xp->ctrl);
+		_d("writing xprobe: -:%s\n", &gl.gl_pathv[i][evstart]);
 		pending++;
 
 		/* The kernel parser doesn't deal with a probe definition
@@ -168,8 +170,11 @@ static int xprobe_create_pattern(struct ply_probe *pb)
 		 * 512 bytes left, flush the buffer. */
 		if (pending > (0x1000 - 0x200)) {
 			err = fflush(xp->ctrl);
-			if (err)
+			if (err) {
+				_e("%s: Unable to create xprobe: %s\n",
+				   sym->sym, strerror(errno));
 				return -errno;
+			}
 
 			pending = 0;
 		}
@@ -192,8 +197,13 @@ static int xprobe_create(struct ply_probe *pb)
 		xp->n_evs++;
 	}
 
-	if (!err)
+	if (!err) {
 		err = fflush(xp->ctrl) ? -errno : 0;
+		if (err) {
+			_e("%s: Unable to create xprobe: %s\n",
+			   pb->probe, strerror(errno));
+		}
+	}
 	return err;
 }
 
@@ -218,6 +228,8 @@ static int __xprobe_attach(struct ply_probe *pb)
 						 pb->special);
 		if (xp->evfds[i] < 0) {
 			err = xp->evfds[i];
+			_e("%s: Unable to attach xprobe: %s\n",
+			   pb->probe, strerror(errno));
 			break;
 		}
 	}
