@@ -13,6 +13,8 @@
 #include <ply/ply.h>
 #include <ply/internal.h>
 
+int ply_debug;
+
 static void strkill(char *str, char kill)
 {
 	char *r, *w;

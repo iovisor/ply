@@ -244,6 +244,7 @@ int main(int argc, char **argv)
 			break;
 		case 'd':
 			ply_config.verify = 1;
+			ply_debug = 1;
 			break;
 		case 'e':
 			f_dryrun = 1;

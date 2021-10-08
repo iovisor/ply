@@ -17,6 +17,9 @@ FILE *fopenf(const char *mode, const char *fmt, ...)
 
 void ast_fprint(FILE *fp, struct node *root);
 
+/* This variable controls debug output for non-DEBUG build. */
+extern int ply_debug;
+
 #include "printxf.h"
 
 #ifdef DEBUG
@@ -31,7 +34,7 @@ void ast_fprint(FILE *fp, struct node *root);
 #ifdef DEBUG
 #define _d(fmt, ...) _l("debug: ", fmt, ##__VA_ARGS__)
 #else
-#define _d(fmt, ...)
+#define _d(fmt, ...) if (ply_debug) _l("debug: ", fmt, ##__VA_ARGS__)
 #endif
 
 #define _i(fmt, ...) _l("info: ",    fmt, ##__VA_ARGS__)
