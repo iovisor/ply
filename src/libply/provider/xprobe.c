@@ -40,12 +40,13 @@ static int __xprobe_create(FILE *ctrl, const char *stem, const char *func)
 		funcname = strdup(func);
 	assert(funcname);
 
-	offs = strchr(funcname, '+');
-	if (offs)
+	while (1) {
+		offs = strpbrk(funcname, "+-:;~!@#$%^&*()[]{}<>|?=., ");
+		if (!offs)
+			break;
+
 		*offs = '_';
-	offs = strchr(funcname, ':');
-	if (offs)
-		*offs = '_';
+	}
 
 	fputs(stem,     ctrl);
 	fputs(funcname, ctrl);
