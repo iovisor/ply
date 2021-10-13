@@ -80,6 +80,7 @@ static inline struct ply_probe *sym_to_probe(struct sym *sym)
 }
 
 void ply_maps_print(struct ply *ply);
+void ply_map_print(struct ply *ply, struct sym *sym, FILE *fp);
 
 struct ply_return ply_loop(struct ply *ply);
 

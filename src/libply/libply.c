@@ -25,7 +25,7 @@ struct ply_config ply_config = {
 	.strict = 1,
 };
 
-static void ply_map_print(struct ply *ply, struct sym *sym)
+void ply_map_print(struct ply *ply, struct sym *sym, FILE *fp)
 {
 	struct type *t = sym->type;
 	size_t key_size, val_size, row_size, n_elems;
@@ -63,10 +63,13 @@ static void ply_map_print(struct ply *ply, struct sym *sym)
 	if (ply_config.sort)
 		qsort_r(data, n_elems, row_size, type_cmp, t);
 
-	printf("\n%s:\n", sym->name);
+	fprintf(fp, "\n%s:\n", sym->name);
 	for (row = data; n_elems > 0; row += row_size, n_elems--) {
-		type_fprint(t, stdout, row);
-		fputc('\n', stdout);
+		type_fprint(t->map.ktype, fp, row);
+		fputs(": ", fp);
+
+		type_fprint(t->map.vtype, fp, row + type_sizeof(t->map.ktype));
+		fputc('\n', fp);
 	}
 
 err_free:
@@ -83,7 +86,7 @@ void ply_maps_print(struct ply *ply)
 		if (sym->type->ttype == T_MAP
 		    && sym->type->map.mtype != BPF_MAP_TYPE_PERF_EVENT_ARRAY
 		    && sym->type->map.mtype != BPF_MAP_TYPE_STACK_TRACE)
-			ply_map_print(ply, sym);
+			ply_map_print(ply, sym, stdout);
 	}	
 }
 
