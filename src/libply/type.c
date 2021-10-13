@@ -284,23 +284,16 @@ static int type_fprint_array(struct type *t, FILE *fp, const void *data)
 
 static int type_fprint_map(struct type *t, FILE *fp, const void *data)
 {
-	int ret, total = 0;
+	struct ply *ply = (struct ply *)data;
+	struct sym **symp;
 
-	ret = type_fprint(t->map.ktype, fp, data);
-	if (ret < 0)
-		return ret;
-
-	total += ret;
-
-	fputs(": ", fp);
-	total += 2;
-
-	ret = type_fprint(t->map.vtype, fp, data + type_sizeof(t->map.ktype));
-	if (ret < 0)
-		return ret;
-
-	total += ret;
-	return total;
+	symtab_foreach(&ply->globals, symp) {
+		if ((*symp)->type == t) {
+			ply_map_print(ply, *symp, fp);
+			break;
+		}
+	}
+	return 0;
 }
 
 int type_fprint_struct(struct type *t, FILE *fp, const void *data)

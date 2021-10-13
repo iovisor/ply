@@ -284,16 +284,26 @@ static struct func printf_func = {
 	.rewrite = printf_rewrite,
 };
 
+struct print_ev_data {
+	struct node *n;
+	struct ply *ply;
+};
 
 static struct ply_return print_ev_handler(struct buffer_ev *ev, void *_n)
 {
-	struct node *n = _n;
+	struct print_ev_data *data = _n;
+	struct node *n = data->n;
 	struct type *t = n->sym->type;
 	struct tfield *f;
 
 	tfields_foreach(f, t->sou.fields) {
 		if (f != t->sou.fields)
 			fputs(", ", stdout);
+
+		if (f->type->ttype == T_MAP) {
+			type_fprint(f->type, stdout, data->ply);
+			continue;
+		}
 
 		type_fprint(f->type, stdout,
 			    ev->data + type_offsetof(t, f->name));
@@ -308,6 +318,7 @@ static int print_rewrite(const struct func *func, struct node *n,
 {
 	struct node *bwrite, *exprs, *ev;
 	struct buffer_evh *evh;
+	struct print_ev_data *data;
 	uint64_t id;
 
 	evh = n->sym->priv;
@@ -328,13 +339,21 @@ static int print_rewrite(const struct func *func, struct node *n,
 			   NULL);
 
 	node_replace(n, bwrite);
-	evh->priv = ev->expr.args->next;
+
+	data = malloc(sizeof(*data));
+	if (data == NULL)
+		return -1;
+
+	data->n = ev->expr.args->next;
+	data->ply = pb->ply;
+
+	/* TODO: leaked */
+	evh->priv = data;
 	return 1;
 }
 
 static int print_type_infer(const struct func *func, struct node *n)
 {
-	struct node *expr = n->expr.args;
 	struct buffer_evh *evh;
 
 	if (n->sym->type)

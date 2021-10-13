@@ -213,6 +213,7 @@ basic
 : NUMBER
 | STRING
 | IDENT
+| AGG
 | '(' expr ')'	{ $$ = $2; }
 ;
 

@@ -175,8 +175,43 @@ static const struct func env_func = {
 };
 
 
+static int ident_ir_post(const struct func *func, struct node *n,
+			 struct ply_probe *pb)
+{
+	if (n->sym->type->ttype == T_MAP && !n->sym->irs.hint.lval) {
+		struct irstate *irs = &n->sym->irs;
+
+		irs->hint.stack = 1;
+		ir_init_sym(pb->ir, n->sym);
+
+		/*
+		 * It'd be nice if we can save the map fd to a register
+		 * and then move it to the stack for the symbol.
+		 * But it was rejected by the kernel:
+		 *
+		 *   error: output from kernel bpf verifier:
+		 *   0: (bf) r6 = r1
+		 *   1: (18) r1 = 0xffff9271503e5400
+		 *   3: (63) *(u32 *)(r10 -4) = r1
+		 *   invalid size of register spill
+		 *
+		 * Actually, it doesn't matter which value we pass it
+		 * to the (async) print.  All we need is a type info
+		 * and it's provided already.
+		 *
+		 * So let's just fill it by zero.
+		 */
+		ir_emit_insn(pb->ir, ST_IMM(bpf_width(irs->size), irs->stack, 0),
+			     BPF_REG_BP, 0);
+	}
+
+	return 0;
+}
+
 static const struct func ident_func = {
 	.name = ":ident",
+
+	.ir_post = ident_ir_post,
 };
 
 

@@ -556,7 +556,6 @@ static struct func struct_func = {
 };
 
 
-
 static int map_ir_update(struct node *n, struct ply_probe *pb)
 {
 	struct node *map, *key;
