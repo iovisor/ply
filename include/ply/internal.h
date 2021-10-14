@@ -25,4 +25,6 @@
 
 void built_in_init(void);
 
+#define ARRAY_SIZE(a)  (sizeof(a) / sizeof(a[0]))
+
 #endif	/* _PLY_INTERNAL_H */

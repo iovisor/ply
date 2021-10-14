@@ -337,6 +337,23 @@ These special providers are called at the beginning and the end of the
 tracing session like awk and bpftrace.  The names are case sensitive.
 Users can print some messages or fill maps to known info.
 
+### interval
+
+The interval provider will be trigger at each given interval.
+Users can specify time and unit (optional). If unit is omitted, then
+second is used.  The supported units are:
+
+  * m: minutes
+  * s: seconds  (default)
+  * ms: milli-seconds
+  * us: micro-seconds
+  * ns: nano-seconds
+
+Examples:
+
+  * _interval:1_: Called for every second
+  * _interval:500ms_: Called for every 500 milli-second
+
 
 ## EXAMPLE
 

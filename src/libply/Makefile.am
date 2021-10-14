@@ -34,13 +34,14 @@ libply_la_SOURCES     = 	\
 	built-in/print.c	\
 	built-in/proc.c		\
 	\
+	provider/interval.c	\
 	provider/kprobe.c	\
 	provider/kprobe.h	\
 	provider/kretprobe.c	\
+	provider/special.c	\
 	provider/tracepoint.c	\
 	provider/xprobe.c	\
 	provider/xprobe.h	\
-	provider/special.c	\
 	\
 	compile.c		\
 	func.c			\

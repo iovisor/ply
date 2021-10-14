@@ -92,4 +92,12 @@ else
     err=1
 fi
 
+echo -n "Verifying interval... "
+if $PLYBIN 'interval:1s { exit(0); }' 2>/dev/null; then
+    echo "OK"
+else
+    echo "ERROR"
+    err=1
+fi
+
 exit $err

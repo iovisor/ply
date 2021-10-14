@@ -49,4 +49,12 @@ ply -c \
 grep -qe '8k\s*,\s*16k\s*)\s*10' /tmp/quantize \
 || fail "10 reads in (8k, 16k]" "$(cat /tmp/quantize)"
 
+case=interval
+ply -c 'for i in `seq 3`; do dd if=/dev/zero of=/dev/null count=10; sleep 1; done' \
+    'k:vfs_read { @[pid] = count(); }
+     i:1 { print(@); clear(@); }' >/tmp/interval \
+&& \
+cat /tmp/interval | awk '/^@:/ { count++; } END { exit(count < 3); }' \
+|| fail "at least 3 print" "$(cat /tmp/interval)"
+
 exit $total_fails
