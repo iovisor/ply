@@ -830,6 +830,112 @@ static struct func delete_func = {
 	.ir_post = delete_ir_post,
 };
 
+
+struct clear_ev_data {
+	struct node *n;
+	struct ply *ply;
+};
+
+static struct ply_return clear_ev_handler(struct buffer_ev *ev, void *_n)
+{
+	struct clear_ev_data *data = _n;
+	struct node *n = data->n;
+	struct type *t = n->sym->type;
+	struct tfield *f;
+	struct sym **symp, *sym;
+
+	tfields_foreach(f, t->sou.fields) {
+		if (f->type->ttype != T_MAP)
+			continue;
+
+		symtab_foreach(&data->ply->globals, symp) {
+			sym = *symp;
+
+			if (sym->type == f->type)
+				ply_map_clear(data->ply, sym);
+		}
+	}
+
+	return (struct ply_return){ };
+}
+
+static int clear_type_infer(const struct func *func, struct node *n)
+{
+	struct buffer_evh *evh;
+
+	if (n->sym->priv)
+		return 0;
+
+	evh = xcalloc(1, sizeof(*evh));
+
+	evh->handle = clear_ev_handler;
+	buffer_evh_register(evh);
+
+	/* TODO: leaked */
+	n->sym->priv = evh;
+	return 0;
+}
+
+static int clear_rewrite(const struct func *func, struct node *n,
+			struct ply_probe *pb)
+{
+	struct node *bwrite, *exprs, *ev;
+	struct buffer_evh *evh;
+	struct clear_ev_data *data;
+	uint64_t id;
+
+	evh = n->sym->priv;
+	id = evh->id;
+
+	exprs = n->expr.args;
+	n->expr.args = NULL;
+
+	ev = node_expr(&n->loc, ":struct",
+		       __node_num(&n->loc, sizeof(evh->id), NULL, &id),
+		       node_expr(&n->loc, ":struct", exprs, NULL),
+		       NULL);
+
+	bwrite = node_expr(&n->loc, "bwrite",
+			   node_expr(&n->loc, "ctx", NULL),
+			   node_expr(&n->loc, "stdbuf", NULL),
+			   ev,
+			   NULL);
+
+	node_replace(n, bwrite);
+
+	data = malloc(sizeof(*data));
+	if (data == NULL)
+		return -1;
+
+	data->n = ev->expr.args->next;
+	data->ply = pb->ply;
+
+	/* TODO: leaked */
+	evh->priv = data;
+	return 1;
+}
+
+static int clear_static_validate(const struct func *func, struct node *n)
+{
+	struct node *arg = n->expr.args;
+
+	if (arg->sym->type == NULL || arg->sym->type->ttype == T_MAP)
+		return 0;
+
+	_ne(n, "can't delete %N, a map was expected.\n", arg);
+	return -EINVAL;
+}
+
+static struct func clear_func = {
+	.name = "clear",
+	.type = &t_unary_func,
+	.static_ret = 1,
+	.static_validate = clear_static_validate,
+
+	.type_infer = clear_type_infer,
+	.rewrite = clear_rewrite,
+};
+
 void memory_init(void)
 {
 	built_in_register(&strcmp_func);
@@ -843,4 +949,5 @@ void memory_init(void)
 	built_in_register(&assign_func);
 	built_in_register(&agg_func);
 	built_in_register(&delete_func);
+	built_in_register(&clear_func);
 }

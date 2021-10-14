@@ -132,6 +132,8 @@ The _delete_ keyword can be used to remove an association from a map:
 
     delete mapname[exprs]
 
+You can also remove all elements in the map using _clear_ function.
+
 
 ### Aggregations
 

@@ -60,6 +60,9 @@ void ply_map_print(struct ply *ply, struct sym *sym, FILE *fp)
 		n_elems++;
 	}
 
+	if (n_elems == 0)
+		goto err_free;
+
 	if (ply_config.sort)
 		qsort_r(data, n_elems, row_size, type_cmp, t);
 
@@ -88,6 +91,36 @@ void ply_maps_print(struct ply *ply)
 		    && sym->type->map.mtype != BPF_MAP_TYPE_STACK_TRACE)
 			ply_map_print(ply, sym, stdout);
 	}	
+}
+
+void ply_map_clear(struct ply *ply, struct sym *sym)
+{
+	struct type *t = sym->type;
+	size_t key_size, n_elems;
+	char *key, *data;
+	int err;
+
+	key_size = type_sizeof(t->map.ktype);
+
+	data = calloc(ply_config.map_elems, key_size);
+	if (!data) {
+		_e("not enough memory to clear '%s'\n", sym->name);
+		return;
+	}
+
+	key = data;
+
+	for (n_elems = 0, err = bpf_map_next(sym->mapfd, NULL, key); !err;
+	     err = bpf_map_next(sym->mapfd, key - key_size, key)) {
+		key += key_size;
+		n_elems++;
+	}
+
+	for (key = data; n_elems > 0; key += key_size, n_elems--) {
+		bpf_map_delete(sym->mapfd, key);
+	}
+
+	free(data);
 }
 
 void ply_probe_free(struct ply *ply, struct ply_probe *pb)
