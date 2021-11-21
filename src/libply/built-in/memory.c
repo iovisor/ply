@@ -629,6 +629,11 @@ static int map_type_infer(const struct func *func, struct node *n)
 		return 0;
 
 	if (map->sym->type) {
+		if (map->sym->type->ttype != T_MAP) {
+			_ne(n, "expect map type, but get %N\n", map);
+			return -EINVAL;
+		}
+
 		if (!n->sym->type)
 			/* given `m[key]` where m's type is known,
 			 * infer that the expression's type is equal
