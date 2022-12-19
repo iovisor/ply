@@ -57,7 +57,7 @@ else
 fi
 
 echo -n "Ensuring that debugfs is mounted... "
-if mountpoint -q /sys/kernel/debug; then
+if mount -t debugfs | grep -qw "/sys/kernel/debug"; then
     echo "OK"
 else
     echo "ERROR"
