@@ -147,7 +147,7 @@ const char *arch_register_argument(int num)
 	case 1: return "a1";
 	case 2: return "a2";
 	case 3: return "a3";
-#ifdef USE_MIPS_N32
+#ifndef _ABIO32 /* n32 or native 64-bit ABI */
 	case 4: return "a4";
 	case 5: return "a5";
 	case 6: return "a6";
