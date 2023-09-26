@@ -360,6 +360,15 @@ Examples:
   * _interval:1_: Called for every second
   * _interval:500ms_: Called for every 500 milli-second
 
+### profile
+
+The profile provider supports profiling by allowing the user to specify
+how many times it will fire per-second.  Values of 1-1000 are supported,
+and the profile provider supports two probe formats:
+
+  * profile:[N]hz: Profile on all CPUs N times per second
+  * profile:[C]:[N]hz: Profile on CPU C N times per second
+
 
 ## EXAMPLE
 

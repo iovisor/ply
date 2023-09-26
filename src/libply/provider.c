@@ -22,6 +22,7 @@ extern struct provider built_in;
 extern struct provider begin_provider;
 extern struct provider end_provider;
 extern struct provider interval;
+extern struct provider profile;
 
 struct provider *provider_get(const char *name)
 {
@@ -45,6 +46,7 @@ void provider_init(void)
 	SLIST_INSERT_HEAD(&heads, &begin_provider, entry);
 	SLIST_INSERT_HEAD(&heads, &built_in, entry);
 	SLIST_INSERT_HEAD(&heads, &interval, entry);
+	SLIST_INSERT_HEAD(&heads, &profile, entry);
 	SLIST_INSERT_HEAD(&heads, &tracepoint, entry);
 	SLIST_INSERT_HEAD(&heads, &kretprobe, entry);
 	/* place kprobe at head so that 'k' can match first. */

@@ -99,6 +99,29 @@ int perf_event_attach_raw(struct ply_probe *pb, int type, unsigned long config,
 	return fd;
 }
 
+int perf_event_attach_profile(struct ply_probe *pb, int cpu,
+			  unsigned long long freq)
+{
+	struct perf_event_attr attr = {};
+	int fd;
+
+	attr.type = PERF_TYPE_SOFTWARE;
+	attr.config = PERF_COUNT_SW_CPU_CLOCK;
+	attr.sample_freq = freq;
+	attr.freq = 1;
+
+	fd = perf_event_open(&attr, -1, cpu, -1, 0);
+	if (fd < 0)
+		return -errno;
+
+	if (ioctl(fd, PERF_EVENT_IOC_SET_BPF, pb->bpf_fd)) {
+		close(fd);
+		return -errno;
+	}
+
+	return fd;
+}
+
 int perf_event_enable(int group_fd)
 {
 	if (ioctl(group_fd, PERF_EVENT_IOC_ENABLE, PERF_IOC_FLAG_GROUP))

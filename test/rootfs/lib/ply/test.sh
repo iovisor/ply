@@ -84,4 +84,19 @@ cat /tmp/tracepoint-dyn | awk '
     END      { exit(!(unames >= 10)); }' \
 || fail "at least 10 unames" "$(cat /tmp/tracepoint-dyn)"
 
+case=profile
+ply 'BEGIN { printf("profile provider unit test\n"); c["profile_test"] = 0; }
+     profile:0:100hz
+     {
+         if (c["profile_test"] == 100)
+             exit(0);
+         else
+             c["profile_test"] = c["profile_test"] + 1;
+     }' >/tmp/profile \
+&& \
+cat /tmp/profile | awk -F': ' '
+    /profile_test/  { count = $2; }
+    END             { exit(count != 100); }' \
+|| fail "count should be 100 for profile provider test" "$(cat /tmp/profile)"
+
 exit $total_fails
