@@ -520,7 +520,7 @@ ssize_t ir_alloc_stack(struct ir *ir, size_t size, size_t align)
 	ir->sp -= size;
 
 	if (ir->sp % align)
-		ir->sp -= align - (ir->sp & (align - 1));
+		ir->sp &= ~(align - 1);
 
 	assert(ir->sp > INT16_MIN);
 
